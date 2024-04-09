@@ -5,8 +5,11 @@
     "imap": "^0.8.17",
     "nodemailer": "^6.9.13",
     "pop3": "^0.2.0",
+    "qs": "^6.12.0",
     "react-native-document-picker": "^9.1.1",
+    "react-native-file-picker": "^0.0.21",
     "react-native-mail": "^6.1.1",
-    "react-native-smtp-mailer": "^1.2.5"
+    "react-native-smtp-mailer": "^1.2.5",
+    "smtp": "^0.1.4"
   }
 }
