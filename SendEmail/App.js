@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Button, TextInput, View, Text, StyleSheet, Image, Alert } from "react-native";
+import email from "react-native-email";
 
 const SendEmailScreen = () => {
   const [recipient, setRecipient] = useState("");
@@ -9,62 +10,22 @@ const SendEmailScreen = () => {
   const [subjectError, setSubjectError] = useState(false);
   const [bodyError, setBodyError] = useState(false);
 
-  const sendEmail = async () => {
-    try {
-      const accessToken = "YOUR_ACCESS_TOKEN"; // Thay YOUR_ACCESS_TOKEN bằng token truy cập bạn nhận từ quy trình xác thực.
-  
-      const emailData = {
-        to: recipient,
-        subject: subject,
-        message: body,
-      };
+  const sendEmail = () => {
+    if (!recipient.trim() || !subject.trim() || !body.trim()) {
+      if (!recipient.trim()) setRecipientError(true);
+      if (!subject.trim()) setSubjectError(true);
+      if (!body.trim()) setBodyError(true);
+      return;
+    }
 
-      const response = await fetch("https://www.googleapis.com/gmail/v1/users/me/messages/send", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          raw: btoa(
-            `From: Your Name <your.email@gmail.com>\nTo: ${emailData.to}\nSubject: ${emailData.subject}\n\n${emailData.message}`
-          ),
-        }),
-      });
-
-      if (response.ok) {
-        console.log("Email sent successfully!");
-      } else {
-        console.error("Failed to send email:", response.statusText);
-      }
-    } catch (error) {
+    const to = [recipient];
+    email(to, {
+      subject,
+      body,
+    }).catch(error => {
       console.error("Error sending email:", error);
-    }
-  };
-  
-  const validateInputs = () => {
-    let isValid = true;
-    if (!recipient.trim()) {
-      setRecipientError(true);
-      isValid = false;
-    }
-    if (!subject.trim()) {
-      setSubjectError(true);
-      isValid = false;
-    }
-    if (!body.trim()) {
-      setBodyError(true);
-      isValid = false;
-    }
-    return isValid;
-  };
-
-  const handleSendEmail = () => {
-    if (validateInputs()) {
-      sendEmail();
-    } else {
-      Alert.alert("Error", "Please fill in all fields.");
-    }
+      Alert.alert("Error", "Failed to send email. Please try again later.");
+    });
   };
 
   return (
@@ -79,7 +40,7 @@ const SendEmailScreen = () => {
         <Text style={styles.label}>Người Nhận</Text>
         <TextInput
           style={[styles.input, recipientError && styles.errorInput]}
-          placeholder="example@gmail.com..."
+          placeholder="Nhập email người nhận..."
           onChangeText={(text) => {
             setRecipient(text);
             setRecipientError(false);
@@ -87,12 +48,12 @@ const SendEmailScreen = () => {
           value={recipient}
         />
         {recipientError && (
-          <Text style={styles.errorMessage}>Please enter recipient</Text>
+          <Text style={styles.errorMessage}>Vui lòng nhập email người nhận</Text>
         )}
         <Text style={styles.label}>Tiêu Đề</Text>
         <TextInput
           style={[styles.input, subjectError && styles.errorInput]}
-          placeholder="Enter your Subject.."
+          placeholder="Nhập tiêu đề..."
           onChangeText={(text) => {
             setSubject(text);
             setSubjectError(false);
@@ -100,7 +61,7 @@ const SendEmailScreen = () => {
           value={subject}
         />
         {subjectError && (
-          <Text style={styles.errorMessage}>Please enter subject</Text>
+          <Text style={styles.errorMessage}>Vui lòng nhập tiêu đề</Text>
         )}
         <Text style={styles.label}>Nội Dung</Text>
         <TextInput
@@ -109,7 +70,7 @@ const SendEmailScreen = () => {
             styles.bodyInput,
             bodyError && styles.errorInput,
           ]}
-          placeholder="Write your content here..."
+          placeholder="Nhập nội dung email..."
           onChangeText={(text) => {
             setBody(text);
             setBodyError(false);
@@ -118,10 +79,10 @@ const SendEmailScreen = () => {
           multiline
         />
         {bodyError && (
-          <Text style={styles.errorMessage}>Please enter body</Text>
+          <Text style={styles.errorMessage}>Vui lòng nhập nội dung email</Text>
         )}
       </View>
-      <Button title="Send Email" onPress={handleSendEmail} />
+      <Button title="Gửi Email" onPress={sendEmail} />
     </View>
   );
 };
