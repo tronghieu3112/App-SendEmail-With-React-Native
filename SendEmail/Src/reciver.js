@@ -1,100 +1,108 @@
-import React, { useState } from "react";
-import { Button, TextInput, View, Text, StyleSheet, Image, Alert } from "react-native";
-import axios from "axios"; // Import thư viện Axios
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
+import email from "react-native-email";
 
-const SendEmailScreen = () => {
-  const [recipient, setRecipient] = useState("");
-  const [subject, setSubject] = useState("");
-  const [body, setBody] = useState("");
+export default function App() {
+  const [email, setEmail] = useState({
+    sender: 'Gordon Ramsay',
+    subject: 'Gordon Ramsay Criticizes Dish!!!',
+    content: 'This is the worst dish I have ever tasted!',
+    marked: false,
+    receivedAt: new Date().toLocaleString(),
+  });
 
-  const sendEmail = () => {
-    // Tạo một object chứa dữ liệu email
-    const emailData = {
-      recipient,
-      subject,
-      body
-    };
+  const toggleMarkAsRead = () => {
+    setEmail(prevState => ({
+      ...prevState,
+      marked: !prevState.marked,
+    }));
+  };
 
-    // Gửi yêu cầu POST đến endpoint của server backend
-    axios.post('YOUR_BACKEND_ENDPOINT', emailData)
-      .then(response => {
-        console.log("Email sent successfully:", response.data);
-        Alert.alert("Success", "Email sent successfully!");
-      })
-      .catch(error => {
-        console.error("Error sending email:", error);
-        Alert.alert("Error", "Failed to send email. Please try again later.");
-      });
+  const deleteEmail = () => {
+    // Logic to delete email
+  };
+
+  const replyEmail = () => {
+    // Logic to reply to email
+  };
+
+  const navigateBack = () => {
+    // Logic to navigate back to main screen
   };
 
   return (
     <View style={styles.container}>
-      <Image
-        style={styles.logo}
-        source={{
-          uri: "https://media.licdn.com/dms/image/D5612AQFoqQzDOOrOPg/article-cover_image-shrink_600_2000/0/1668548104191?e=2147483647&v=beta&t=q_nbDyHK9F1fRSdcaeBMas47L2xZd4T55ohhArbFakY",
-        }}
-      />
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Recipient</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter recipient's email..."
-          onChangeText={(text) => setRecipient(text)}
-          value={recipient}
-        />
-        <Text style={styles.label}>Subject</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter subject..."
-          onChangeText={(text) => setSubject(text)}
-          value={subject}
-        />
-        <Text style={styles.label}>Body</Text>
-        <TextInput
-          style={[styles.input, styles.bodyInput]}
-          placeholder="Enter email body..."
-          onChangeText={(text) => setBody(text)}
-          value={body}
-          multiline
-        />
+      <View style={styles.toolbar}>
+        <TouchableOpacity onPress={toggleMarkAsRead} style={styles.toolbarButton}>
+          <Text>{email.marked ? 'Readed' : 'Mark as Read'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={navigateBack} style={styles.toolbarButton}>
+          <Text>Back</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={deleteEmail} style={styles.toolbarButton}>
+          <Text>Delete</Text>
+        </TouchableOpacity>
       </View>
-      <Button title="Send Email" onPress={sendEmail} />
+      <View style={styles.datetimeContainer}>
+        <Text style={styles.datetime}>{email.receivedAt}</Text>
+      </View>
+      <ScrollView style={styles.emailContainer}>
+        <Text style={styles.sender}>{email.sender}</Text>
+        <Text style={styles.subject}>{email.subject}</Text>
+        <Text style={styles.content}>{email.content}</Text>
+      </ScrollView>
+      <TouchableOpacity onPress={replyEmail} style={styles.replyButton}>
+        <Text>Reply</Text>
+      </TouchableOpacity>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#fff',
+    padding: 10,
   },
-  inputContainer: {
-    width: "80%",
-    marginBottom: 20,
-  },
-  label: {
-    marginBottom: 5,
-    fontWeight: "bold",
-  },
-  input: {
-    width: "100%",
-    height: 40,
-    borderWidth: 1,
-    borderColor: "black",
+  toolbar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: 10,
-    paddingHorizontal: 10,
+    marginTop: 20,
   },
-  bodyInput: {
-    height: 100,
-    paddingTop: 10,
+  toolbarButton: {
+    padding: 10,
+    borderRadius: 5,
+    backgroundColor: '#DDDDDD',
   },
-  logo: {
-    width: 150,
-    height: 150,
-    marginBottom: 20,
+  datetimeContainer: {
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  datetime: {
+    fontSize: 16,
+  },
+  emailContainer: {
+    flex: 1,
+  },
+  sender: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  subject: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  content: {
+    fontSize: 16,
+  },
+  replyButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 15,
+    borderRadius: 5,
+    backgroundColor: '#DDDDDD',
   },
 });
-
-export default SendEmailScreen;

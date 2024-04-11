@@ -1,35 +1,52 @@
 import React, { useState } from "react";
-import { Button, TextInput, View, Text, StyleSheet, Image, Alert } from "react-native";
-import email from "react-native-email";
+import { Button, TextInput, View, Text, StyleSheet, Image, Alert, TouchableOpacity } from "react-native";
+import RNSmtpMailer from "react-native-smtp-mailer";
+import { Ionicons } from '@expo/vector-icons';
 
-const SendEmailScreen = () => {
-  const [recipient, setRecipient] = useState("");
+const SendEmailScreen = ({ navigation }) => {
+  const [sender, setSender] = useState("");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
-  const [recipientError, setRecipientError] = useState(false);
+  const [senderError, setSenderError] = useState(false);
   const [subjectError, setSubjectError] = useState(false);
   const [bodyError, setBodyError] = useState(false);
+  const [senderFilled, setSenderFilled] = useState(false);
+  const [subjectFilled, setSubjectFilled] = useState(false);
+  const [bodyFilled, setBodyFilled] = useState(false);
 
-  const sendEmail = () => {
-    if (!recipient.trim() || !subject.trim() || !body.trim()) {
-      if (!recipient.trim()) setRecipientError(true);
-      if (!subject.trim()) setSubjectError(true);
-      if (!body.trim()) setBodyError(true);
-      return;
-    }
+  const sendEmail = async () => {
+    try {
+      if (!sender.trim() || !subject.trim() || !body.trim()) {
+        if (!sender.trim()) setSenderError(true);
+        if (!subject.trim()) setSubjectError(true);
+        if (!body.trim()) setBodyError(true);
+        return;
+      }
 
-    const to = [recipient];
-    email(to, {
-      subject,
-      body,
-    }).catch(error => {
+      await RNSmtpMailer.sendMail({
+        mailhost: "smtp.gmail.com",
+        port: 465,
+        ssl: true,
+        username: "",
+        password: "",
+        from: "",
+        sender: sender,
+        subject: subject,
+        htmlBody: body
+      });
+
+      Alert.alert("Success", "Email sent successfully.");
+    } catch (error) {
       console.error("Error sending email:", error);
-      Alert.alert("Error", "Failed to send email. Please try again later.");
-    });
+      Alert.alert("Error", error.message || "Failed to send email. Please try again later.");
+    }
   };
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Ionicons name="arrow-back" size={24} color="black" />
+      </TouchableOpacity>
       <Image
         style={styles.logo}
         source={{
@@ -39,48 +56,54 @@ const SendEmailScreen = () => {
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Người Nhận</Text>
         <TextInput
-          style={[styles.input, recipientError && styles.errorInput]}
+          style={[
+            styles.input,
+            senderError && styles.errorInput,
+            senderFilled && !senderError && { backgroundColor: 'lightyellow' } 
+          ]}
           placeholder="Nhập email người nhận..."
           onChangeText={(text) => {
-            setRecipient(text);
-            setRecipientError(false);
+            setSender(text);
+            setSenderError(false);
+            setSenderFilled(!!text.trim()); 
           }}
-          value={recipient}
+          value={sender}
         />
-        {recipientError && (
-          <Text style={styles.errorMessage}>Vui lòng nhập email người nhận</Text>
-        )}
+        {senderError && <Text style={styles.errorText}>Vui lòng nhập email người nhận</Text>}
         <Text style={styles.label}>Tiêu Đề</Text>
         <TextInput
-          style={[styles.input, subjectError && styles.errorInput]}
+          style={[
+            styles.input,
+            subjectError && styles.errorInput,
+            subjectFilled && !subjectError && { backgroundColor: 'lightyellow' } 
+          ]}
           placeholder="Nhập tiêu đề..."
           onChangeText={(text) => {
             setSubject(text);
             setSubjectError(false);
+            setSubjectFilled(!!text.trim()); 
           }}
           value={subject}
         />
-        {subjectError && (
-          <Text style={styles.errorMessage}>Vui lòng nhập tiêu đề</Text>
-        )}
+        {subjectError && <Text style={styles.errorText}>Vui lòng nhập tiêu đề</Text>}
         <Text style={styles.label}>Nội Dung</Text>
         <TextInput
           style={[
             styles.input,
             styles.bodyInput,
             bodyError && styles.errorInput,
+            bodyFilled && !bodyError && { backgroundColor: 'yellow' } 
           ]}
           placeholder="Nhập nội dung email..."
           onChangeText={(text) => {
             setBody(text);
             setBodyError(false);
+            setBodyFilled(!!text.trim()); 
           }}
           value={body}
           multiline
         />
-        {bodyError && (
-          <Text style={styles.errorMessage}>Vui lòng nhập nội dung email</Text>
-        )}
+        {bodyError && <Text style={styles.errorText}>Vui lòng nhập nội dung email</Text>}
       </View>
       <Button title="Gửi Email" onPress={sendEmail} />
     </View>
@@ -121,9 +144,15 @@ const styles = StyleSheet.create({
   errorInput: {
     borderColor: "red",
   },
-  errorMessage: {
+  errorText: {
     color: "red",
     marginBottom: 5,
+  },
+  backButton: {
+    position: "absolute",
+    top: 40,
+    left: 20,
+    zIndex: 1,
   },
 });
 
