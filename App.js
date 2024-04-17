@@ -39,7 +39,7 @@ const SendEmailScreen = ({ navigation }) => {
         username: "tronghieutruonghp@gmail.com",
         password: "smtpmailer", 
         from: "tronghieutruonghp@gmail.com",
-        sender: sender,, 
+        sender: sender,
         subject: subject,
         htmlBody: body
       });
