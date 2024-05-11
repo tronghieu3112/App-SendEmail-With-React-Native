@@ -141,7 +141,7 @@ const EmailListScreen = ({ navigation }) => {
         try {
             const response = await fetch(`http://192.168.1.81:3000/emails/${emailId}`);
             if (!response.ok) {
-                throw new Error('Failed to fetch email content');
+                throw new Error('Failed to fetch email content. Minh test');
             }
             const data = await response.json();
             setSelectedEmailContent(data.text); // Đổi 'content' thành 'text' hoặc 'body' tùy thuộc vào API trả về
