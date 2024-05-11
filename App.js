@@ -113,7 +113,7 @@ import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native
 import { Feather } from '@expo/vector-icons';
 import { Searchbar } from 'react-native-paper';
 
-const EmailListScreen = ({ navigation }) => {
+    const EmailListScreen = ({ navigation }) => {
     const [emails, setEmails] = useState([]);
     const [selectedEmail, setSelectedEmail] = useState(null);
     const [selectedEmailContent, setSelectedEmailContent] = useState(null);
@@ -126,7 +126,7 @@ const EmailListScreen = ({ navigation }) => {
         try {
             const response = await fetch('http://192.168.1.81:3000/emails');
             if (!response.ok) {
-                throw new Error('Failed to fetch emails');
+                throw new Error('Failed to fetch emails!!!');
             }
             const data = await response.json();
             const sortedEmails = data.sort((a, b) => new Date(b.received) - new Date(a.received));
@@ -141,7 +141,7 @@ const EmailListScreen = ({ navigation }) => {
         try {
             const response = await fetch(`http://192.168.1.81:3000/emails/${emailId}`);
             if (!response.ok) {
-                throw new Error('Failed to fetch email content. Minh test');
+                throw new Error('Failed to fetch email content.');
             }
             const data = await response.json();
             setSelectedEmailContent(data.text); // Đổi 'content' thành 'text' hoặc 'body' tùy thuộc vào API trả về
